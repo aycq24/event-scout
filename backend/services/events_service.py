@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from backend.models.event import Event
-
+from backend.schemas.event import EventCreate
 
 def get_events(
     db: Session,
@@ -31,3 +31,15 @@ def get_event_by_id(
     event_id: int,
 ):
     return db.get(Event, event_id)
+
+
+
+
+def create_event(db: Session, event_data: EventCreate) -> Event:
+    event = Event(**event_data.model_dump())
+
+    db.add(event)
+    db.commit()
+    db.refresh(event)
+
+    return event

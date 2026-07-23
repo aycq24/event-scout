@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from backend.database import get_db
 from backend.services import events_service
-
+from backend.schemas.event import EventCreate, EventResponse
 
 router = APIRouter()
 
@@ -38,3 +38,16 @@ def get_event(
         )
 
     return event
+
+
+
+@router.post(
+    "/events",
+    response_model=EventResponse,
+    status_code=201,
+)
+def create_event(
+    event_data: EventCreate,
+    db: Session = Depends(get_db),
+):
+    return events_service.create_event(db, event_data)
