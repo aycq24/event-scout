@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from backend.database import get_db
 from backend.services import events_service
-from backend.schemas.event import EventCreate, EventResponse
+from backend.schemas.event import EventCreate, EventResponse, EventUpdate
 
 router = APIRouter()
 
@@ -51,3 +51,47 @@ def create_event(
     db: Session = Depends(get_db),
 ):
     return events_service.create_event(db, event_data)
+
+
+@router.patch(
+    "/events/{event_id}",
+    response_model=EventResponse,
+)
+def update_event(
+    event_id: int,
+    event_data: EventUpdate,
+    db: Session = Depends(get_db),
+):
+    event = events_service.update_event(
+        db=db,
+        event_id=event_id,
+        event_data=event_data,
+    )
+
+    if event is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Event not found",
+        )
+
+    return event
+
+
+@router.delete(
+    "/events/{event_id}",
+    status_code=204,
+)
+def delete_event(
+    event_id: int,
+    db: Session = Depends(get_db),
+) -> None:
+    deleted = events_service.delete_event(
+        db=db,
+        event_id=event_id,
+    )
+
+    if not deleted:
+        raise HTTPException(
+            status_code=404,
+            detail="Event not found",
+        )

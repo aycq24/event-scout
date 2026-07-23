@@ -10,6 +10,18 @@ class EventCreate(BaseModel):
     description: str
 
 
+
+class EventUpdate(BaseModel):
+    title: str | None = None
+    city: str | None = None
+    category: str | None = None
+    date: str | None = None
+    venue: str | None = None
+    description: str | None = None
+
+
+    
+
 class EventResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
