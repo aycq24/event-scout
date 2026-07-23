@@ -1,9 +1,14 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers.events import router as events_router
+
+from backend.database import Base, engine
+from backend.models.event import Event
+from backend.routers.events import router as events_router
+
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[

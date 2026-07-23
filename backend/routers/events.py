@@ -1,72 +1,40 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+
+from backend.database import get_db
+from backend.services import events_service
+
 
 router = APIRouter()
 
-events = [
-    {
-        "id": 1,
-        "title": "FIFA World Cup Final",
-        "city": "New York",
-        "category": "Sports",
-        "date": "July 19, 2026",
-        "venue": "MetLife Stadium",
-        "description": "Watch the biggest international football match of the year.",
-    },
-    {
-        "id": 2,
-        "title": "Taylor Swift Concert",
-        "city": "Los Angeles",
-        "category": "Concerts",
-        "date": "August 8, 2026",
-        "venue": "SoFi Stadium",
-        "description": "A major live concert experience.",
-    },
-    {
-        "id": 3,
-        "title": "NBA Finals",
-        "city": "San Francisco",
-        "category": "Sports",
-        "date": "June 16, 2026",
-        "venue": "Chase Center",
-        "description": "Experience the intensity of the NBA Finals live.",
-    },
-    {
-        "id": 4,
-        "title": "Anime Expo",
-        "city": "Los Angeles",
-        "category": "Entertainment",
-        "date": "July 2, 2026",
-        "venue": "Los Angeles Convention Center",
-        "description": "Explore anime, manga, gaming, cosplay, and pop culture.",
-    },
-]
-
 
 @router.get("/events")
-def get_events(search: str = "", category: str = "All"):
-    filtered = []
-
-    for event in events:
-        matches_search = search.lower() in event["title"].lower()
-
-        matches_category = (
-            category == "All"
-            or event["category"] == category
-        )
-
-        if matches_search and matches_category:
-            filtered.append(event)
-
-    return filtered
+def get_events(
+    search: str = "",
+    category: str = "All",
+    db: Session = Depends(get_db),
+):
+    return events_service.get_events(
+        db=db,
+        search=search,
+        category=category,
+    )
 
 
 @router.get("/events/{event_id}")
-def get_event(event_id: int):
-    for event in events:
-        if event["id"] == event_id:
-            return event
-
-    raise HTTPException(
-        status_code=404,
-        detail="Event not found",
+def get_event(
+    event_id: int,
+    db: Session = Depends(get_db),
+):
+    event = events_service.get_event_by_id(
+        db=db,
+        event_id=event_id,
     )
+
+    if event is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Event not found",
+        )
+
+    return event
