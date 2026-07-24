@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import EventCard from "@/components/EventCard";
 
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
+
 type Event = {
   id: number;
   title: string;
@@ -44,8 +47,8 @@ export default function Home() {
         const queryString = params.toString();
 
         const url = queryString
-          ? `http://127.0.0.1:8000/events?${queryString}`
-          : "http://127.0.0.1:8000/events";
+          ? `${API_URL}/events?${queryString}`
+          : `${API_URL}/events`;
 
         const response = await fetch(url);
 

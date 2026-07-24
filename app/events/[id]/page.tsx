@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
+
 type Event = {
   id: number;
   title: string;
@@ -18,7 +21,7 @@ type EventDetailPageProps = {
 };
 
 async function getEvent(id: string): Promise<Event | null> {
-  const response = await fetch(`http://127.0.0.1:8000/events/${id}`, {
+  const response = await fetch(`${API_URL}/events/${id}`, {
     cache: "no-store",
   });
 
